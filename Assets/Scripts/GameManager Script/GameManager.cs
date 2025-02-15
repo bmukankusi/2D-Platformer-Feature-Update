@@ -6,44 +6,46 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    public int playerLives = 3; // Player has 3 lives
-    private Vector3 lastSafePosition; // Last safe position before falling into water
+    public int playerLives = 3;
+    private Vector3 lastSafePosition;
 
-    public GameObject gameOverPanel; // UI Panel for Game Over
-    public Button playButton; // Play button
-    public Button replayButton; // Replay button
-    public Button quitButton; // Quit button
+    public GameObject gameOverPanel;
+    public Button playButton;
+    public Button replayButton;
+    public Button quitButton;
+
+    private GameObject player;
 
     void Awake()
     {
-        // Singleton pattern to ensure only one GameManager exists
         if (instance == null)
-        {
             instance = this;
-        }
         else
-        {
             Destroy(gameObject);
-        }
     }
 
     void Start()
     {
-        // Initially, disable the Game Over panel
         gameOverPanel.SetActive(false);
 
-        // Assign button actions
         playButton.onClick.AddListener(StartGame);
         replayButton.onClick.AddListener(RestartGame);
         quitButton.onClick.AddListener(QuitGame);
 
-        // Store the initial safe position
-        lastSafePosition = GameObject.FindGameObjectWithTag("Player").transform.position;
+        player = GameObject.FindGameObjectWithTag("Player");
+
+        if (player != null)
+        {
+            lastSafePosition = player.transform.position;
+        }
+        else
+        {
+            Debug.LogError("Player not found! Make sure the Player GameObject has the 'Player' tag.");
+        }
     }
 
     public void UpdateSafePosition(Vector3 position)
     {
-        // Update the last safe position (called when player is on solid ground)
         lastSafePosition = position;
     }
 
@@ -53,26 +55,23 @@ public class GameManager : MonoBehaviour
 
         if (playerLives > 0)
         {
-            // Respawn player near the water instead of at the start
-            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            Debug.Log("Respawning Player...");
             player.transform.position = lastSafePosition;
         }
         else
         {
-            // Show Game Over screen
+            Debug.Log("Game Over!");
             gameOverPanel.SetActive(true);
         }
     }
 
     void StartGame()
     {
-        // Load the main gameplay scene
         SceneManager.LoadScene("GameScene");
     }
 
     void RestartGame()
     {
-        // Reset lives and reload scene
         playerLives = 3;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }

@@ -88,4 +88,18 @@ public class PlayerMovement : MonoBehaviour
             anim.SetBool("Jump", true);
         }
     }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Water"))
+        {
+            GameManager.instance.PlayerDied(transform.position);
+        }
+    }
+
+    void OnSafeGround()
+    {
+        GameManager.instance.UpdateSafePosition(transform.position);
+    }
+
 }
